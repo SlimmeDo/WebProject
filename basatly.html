@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Basatly - Smart Study Planner</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            width: 450px;
+            margin: auto;
+        }
+
+        input,
+        button {
+            width: 90%;
+            padding: 10px;
+            margin: 8px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            background: #00c6ff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .subject-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+
+        .result {
+            margin-top: 20px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>📚 Basatly</h1>
+    <p>Smart Study Planner</p>
+
+    <div class="container">
+
+        <h3>Add Subject</h3>
+        <input id="subjectName" placeholder="Subject name (Math)">
+        <input id="chapters" placeholder="Chapters (ch1,ch2,ch3)">
+        <input id="difficulty" type="number" placeholder="Difficulty (1-5)">
+        <button onclick="addSubject()">Add Subject</button>
+
+        <h3>Time Info</h3>
+        <input id="hours" type="number" placeholder="Hours per day">
+        <input id="days" type="number" placeholder="Number of days">
+
+        <button onclick="generatePlan()">Generate Plan</button>
+
+        <div id="subjectsList"></div>
+        <div class="result" id="output"></div>
+
+    </div>
+
+    <script>
+        let subjects = [];
+
+        function addSubject() {
+            let name = document.getElementById("subjectName").value;
+            let chapters = document.getElementById("chapters").value.split(",");
+            let difficulty = parseInt(document.getElementById("difficulty").value);
+
+            if (!name || !chapters || !difficulty) return;
+
+            subjects.push({
+                name,
+                chapters,
+                difficulty
+            });
+
+            renderSubjects();
+        }
+
+        function renderSubjects() {
+            let list = document.getElementById("subjectsList");
+            list.innerHTML = "";
+
+            subjects.forEach(sub => {
+                list.innerHTML += `
+      <div class="subject-box">
+        <strong>${sub.name}</strong><br>
+        Chapters: ${sub.chapters.join(", ")}<br>
+        Difficulty: ${sub.difficulty}
+      </div>
+    `;
+            });
+        }
+
+        function generatePlan() {
+            let hours = parseFloat(document.getElementById("hours").value);
+            let days = parseInt(document.getElementById("days").value);
+            let output = document.getElementById("output");
+
+            output.innerHTML = "";
+
+            if (subjects.length === 0 || !hours || !days) {
+                output.innerHTML = "⚠️ Fill everything first";
+                return;
+            }
+
+            let totalHours = hours * days;
+
+            // 🔥 calculate total difficulty
+            let totalDifficulty = subjects.reduce((sum, s) => sum + s.difficulty, 0);
+
+            output.innerHTML += `<h3>📅 Study Plan:</h3>`;
+
+            subjects.forEach(sub => {
+                let subjectHours = (sub.difficulty / totalDifficulty) * totalHours;
+                let hoursPerChapter = subjectHours / sub.chapters.length;
+
+                output.innerHTML += `<h4>📘 ${sub.name}</h4>`;
+                output.innerHTML += `<p>Total: ${subjectHours.toFixed(1)} hrs</p>`;
+
+                sub.chapters.forEach(ch => {
+                    output.innerHTML += `➡️ ${ch.trim()}: ${hoursPerChapter.toFixed(1)} hrs<br>`;
+                });
+            });
+        }
+    </script>
+
+</body>
+
+</html>
