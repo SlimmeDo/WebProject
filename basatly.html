@@ -79,17 +79,29 @@
         let subjects = [];
 
         function addSubject() {
-            let name = document.getElementById("subjectName").value;
-            let chapters = document.getElementById("chapters").value.split(",");
+            let name = document.getElementById("subjectName").value.trim();
+            let chaptersRaw = document.getElementById("chapters").value.trim();
+            let chapters = chaptersRaw.split(",");
             let difficulty = parseInt(document.getElementById("difficulty").value);
 
-            if (!name || !chapters || !difficulty) return;
+            if (!name || !chaptersRaw || !difficulty) return;
+
+            // Check for duplicate subject name
+            if (subjects.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+                alert("⚠️ Subject \"" + name + "\" already exists!");
+                return;
+            }
 
             subjects.push({
                 name,
                 chapters,
                 difficulty
             });
+
+            // Clear input fields
+            document.getElementById("subjectName").value = "";
+            document.getElementById("chapters").value = "";
+            document.getElementById("difficulty").value = "";
 
             renderSubjects();
         }
